@@ -1,7 +1,8 @@
 #include <iostream>
 #include <vector>
 
-void LSDSort(std::vector<long long>& initial_number, int size) {
+void LSDSort(std::vector<long long>& initial_number) {
+  int size = static_cast<int>(initial_number.size());
   std::vector<std::pair<long long, long long>> number(size);
   std::vector<std::pair<long long, long long>> copy_number(size);
   long long max_number = -1;
@@ -21,7 +22,7 @@ void LSDSort(std::vector<long long>& initial_number, int size) {
     }
     for (int i = size - 1; i >= 0; --i) {
       copy_number[--count[number[i].first % kBase]] = {number[i].first / kBase,
-                                                     number[i].second};
+                                                       number[i].second};
     }
     number = copy_number;
     max_number /= kBase;
@@ -43,7 +44,7 @@ int main() {
   for (int i = 0; i < size; ++i) {
     std::cin >> number[i];
   }
-  LSDSort(number, size);
+  LSDSort(number);
   for (int i = 0; i < size; ++i) {
     std::cout << number[i] << '\n';
   }
