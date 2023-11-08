@@ -45,24 +45,22 @@ std::pair<int, int> Partition(std::vector<int>& number, int left, int right,
                               int pivot) {
   int pointer = -1;
   for (int i = left; i < right; ++i) {
-    if (number[i] >= pivot) {
-      continue;
+    if (number[i] < pivot) {
+      std::swap(number[i], number[left + ++pointer]);
     }
-    ++pointer;
-    std::swap(number[i], number[left + pointer]);
   }
   int first = pointer;
   for (int i = left + pointer + 1; i < right; ++i) {
     if (number[i] <= pivot) {
-      ++pointer;
-      std::swap(number[i], number[left + pointer]);
+      std::swap(number[i], number[left + ++pointer]);
     }
   }
   int second = pointer;
   return {first, second};
 }
 
-int DQuickSelect(std::vector<int>& number, int left, int right, int which_one) {
+int DeterministicQuickSelect(std::vector<int>& number, int left, int right,
+                             int which_one) {
   const int kSmallerMassiveMedianHelpConst = 10;
   const int kBase = 10;
   if (right - left <= kBase) {
@@ -93,16 +91,17 @@ int DQuickSelect(std::vector<int>& number, int left, int right, int which_one) {
         SmallQuickSelectStupidSort(help, 0, static_cast<int>(help.size()),
                                    help.size() / 2 + 1);
   }
-  int pivot =
-      DQuickSelect(medians_of_small_massives, 0, (right - left + 4) / 5,
-                   (right - left + 4) / kSmallerMassiveMedianHelpConst + 1);
+  int pivot = DeterministicQuickSelect(
+      medians_of_small_massives, 0, (right - left + 4) / 5,
+      (right - left + 4) / kSmallerMassiveMedianHelpConst + 1);
   std::pair<int, int> pointer = Partition(number, left, right, pivot);
   if (pointer.first >= which_one - 1) {
-    return DQuickSelect(number, left, pointer.first + left + 1, which_one);
+    return DeterministicQuickSelect(number, left, pointer.first + left + 1,
+                                    which_one);
   }
   if (pointer.second < which_one - 1) {
-    return DQuickSelect(number, pointer.second + left + 1, right,
-                        which_one - pointer.second - 1);
+    return DeterministicQuickSelect(number, pointer.second + left + 1, right,
+                                    which_one - pointer.second - 1);
   }
   return pivot;
 }
@@ -121,6 +120,6 @@ int main() {
                  number[i - 2] * kSecondRecursiveConst) %
                 kThirdRecursiveConst;
   }
-  std::cout << DQuickSelect(number, 0, size, which_one) << '\n';
+  std::cout << DeterministicQuickSelect(number, 0, size, which_one) << '\n';
   return 0;
 }
