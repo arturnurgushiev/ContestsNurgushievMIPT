@@ -1,35 +1,40 @@
 #include <deque>
 #include <iostream>
 
-std::deque<int> begin;
-std::deque<int> end;
+class QueueWithPreference {
+ private:
+  std::deque<int> begin_;
+  std::deque<int> end_;
 
-void RegularGoblin(int number) {
-  end.push_back(number);
-  if (end.size() > begin.size()) {
-    begin.push_back(end.front());
-    end.pop_front();
+ public:
+  void RegularGoblin(int number) {
+    end_.push_back(number);
+    if (end_.size() > begin_.size()) {
+      begin_.push_back(end_.front());
+      end_.pop_front();
+    }
   }
-}
 
-void PrintLast() {
-  std::cout << begin.front() << '\n';
-  begin.pop_front();
-  if (end.size() > begin.size()) {
-    begin.push_back(end.front());
-    end.pop_front();
+  void PrintLast() {
+    std::cout << begin_.front() << '\n';
+    begin_.pop_front();
+    if (end_.size() > begin_.size()) {
+      begin_.push_back(end_.front());
+      end_.pop_front();
+    }
   }
-}
 
-void PreferenceGoblin(int number) {
-  if (begin.size() == end.size()) {
-    begin.push_back(number);
-  } else {
-    end.push_front(number);
+  void PreferenceGoblin(int number) {
+    if (begin_.size() == end_.size()) {
+      begin_.push_back(number);
+    } else {
+      end_.push_front(number);
+    }
   }
-}
+};
 
 int main() {
+  QueueWithPreference queue_with_preference;
   int quantity;
   std::cin >> quantity;
   char help;
@@ -37,13 +42,13 @@ int main() {
   for (int i = 0; i < quantity; ++i) {
     std::cin >> help;
     if (help == '-') {
-      PrintLast();
+      queue_with_preference.PrintLast();
     } else if (help == '+') {
       std::cin >> number;
-      RegularGoblin(number);
+      queue_with_preference.RegularGoblin(number);
     } else {
       std::cin >> number;
-      PreferenceGoblin(number);
+      queue_with_preference.PreferenceGoblin(number);
     }
   }
 }
