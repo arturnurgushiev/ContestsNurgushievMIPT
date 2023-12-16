@@ -15,13 +15,14 @@ class QueueWithPreference {
     }
   }
 
-  void PrintLast() {
-    std::cout << begin_.front() << '\n';
+  int Last() {
+    int result = begin_.front();
     begin_.pop_front();
     if (end_.size() > begin_.size()) {
       begin_.push_back(end_.front());
       end_.pop_front();
     }
+    return result;
   }
 
   void PreferenceGoblin(int number) {
@@ -42,7 +43,7 @@ int main() {
   for (int i = 0; i < quantity; ++i) {
     std::cin >> help;
     if (help == '-') {
-      queue_with_preference.PrintLast();
+      std::cout << queue_with_preference.Last() << '\n';
     } else if (help == '+') {
       std::cin >> number;
       queue_with_preference.RegularGoblin(number);
