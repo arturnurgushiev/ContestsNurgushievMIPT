@@ -3,100 +3,71 @@
 #include <string>
 
 class QueueToSolveTheProblem {
- public:
+ private:
   const int kInf = 2147483647;
-  std::stack<int> first;
-  std::stack<int> first_min;
-  std::stack<int> second;
-  std::stack<int> second_min;
-  int size = 0;
+  std::stack<int> first_;
+  std::stack<int> first_min_;
+  std::stack<int> second_;
+  std::stack<int> second_min_;
+  int size_ = 0;
   void FirstToSecond() {
-    while (!first.empty()) {
-      first_min.pop();
-      second.push(first.top());
-      second_min.push(std::min(second_min.top(), first.top()));
-      first.pop();
+    while (!first_.empty()) {
+      first_min_.pop();
+      second_.push(first_.top());
+      second_min_.push(std::min(second_min_.top(), first_.top()));
+      first_.pop();
     }
+  }
+
+ public:
+  QueueToSolveTheProblem() {
+    first_min_.push(kInf);
+    second_min_.push(kInf);
   }
 
   void Push(int number) {
-    ++size;
-    first.push(number);
-    first_min.push(std::min(first_min.top(), number));
-    std::cout << "ok" << '\n';
+    ++size_;
+    first_.push(number);
+    first_min_.push(std::min(first_min_.top(), number));
   }
 
-  void Pop() {
-    if (size == 0) {
-      std::cout << "error" << '\n';
-      return;
-    }
-    --size;
-    if (second.empty()) {
+  int Pop() {
+    --size_;
+    if (second_.empty()) {
       FirstToSecond();
     }
-    std::cout << second.top() << '\n';
-    second.pop();
-    second_min.pop();
+    int result = second_.top();
+    second_.pop();
+    second_min_.pop();
+    return result;
   }
 
-  void Front() {
-    if (size == 0) {
-      std::cout << "error" << '\n';
-      return;
-    }
-    if (second.empty()) {
+  int Front() {
+    if (second_.empty()) {
       FirstToSecond();
     }
-    std::cout << second.top() << '\n';
+    return second_.top();
   }
 
-  void Size() const { std::cout << size << '\n'; }
+  int Size() const { return size_; }
 
   void Clear() {
-    size = 0;
-    while (!first.empty()) {
-      first.pop();
-      first_min.pop();
+    size_ = 0;
+    while (!first_.empty()) {
+      first_.pop();
+      first_min_.pop();
     }
-    while (!second.empty()) {
-      second.pop();
-      second_min.pop();
+    while (!second_.empty()) {
+      second_.pop();
+      second_min_.pop();
     }
-    std::cout << "ok" << '\n';
   }
 
-  void Min() {
-    if (size == 0) {
-      std::cout << "error" << '\n';
-      return;
-    }
-    std::cout << std::min(first_min.top(), second_min.top()) << '\n';
-  }
-
-  void NotPush(const std::string& command) {
-    if (command == "dequeue") {
-      Pop();
-    }
-    if (command == "front") {
-      Front();
-    }
-    if (command == "size") {
-      Size();
-    }
-    if (command == "clear") {
-      Clear();
-    }
-    if (command == "min") {
-      Min();
-    }
-  }
+  int Min() { return std::min(first_min_.top(), second_min_.top()); }
 };
 
 int main() {
   QueueToSolveTheProblem queue;
-  queue.first_min.push(queue.kInf);
-  queue.second_min.push(queue.kInf);
   int quantity;
   int number;
   std::cin >> quantity;
@@ -106,8 +77,35 @@ int main() {
     if (command == "enqueue") {
       std::cin >> number;
       queue.Push(number);
-    } else {
-      queue.NotPush(command);
+      std::cout << "ok" << '\n';
+    }
+    if (command == "dequeue") {
+      if (queue.Size() > 0) {
+        std::cout << queue.Pop() << '\n';
+      } else {
+        std::cout << "error\n";
+      }
+    }
+    if (command == "front") {
+      if (queue.Size() > 0) {
+        std::cout << queue.Front() << '\n';
+      } else {
+        std::cout << "error\n";
+      }
+    }
+    if (command == "size") {
+      std::cout << queue.Size() << '\n';
+    }
+    if (command == "clear") {
+      queue.Clear();
+      std::cout << "ok" << '\n';
+    }
+    if (command == "min") {
+      if (queue.Size() > 0) {
+        std::cout << queue.Min() << '\n';
+      } else {
+        std::cout << "error\n";
+      }
     }
   }
 }
