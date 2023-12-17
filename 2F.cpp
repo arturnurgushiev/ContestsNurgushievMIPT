@@ -3,58 +3,61 @@
 #include <vector>
 
 class Heap {
- public:
-  std::vector<std::pair<long long, int>> heap;
-  std::vector<int> help_to_decrease_key;
-  int size_heap = 0;
+ private:
+  std::vector<std::pair<long long, int>> heap_;
+  std::vector<int> help_to_decrease_key_;
+  int size_heap_ = 0;
   void SiftUp(int index) {
     while (index != 0) {
       int parent = (index - 1) / 2;
-      if (heap[parent].first > heap[index].first) {
-        std::swap(help_to_decrease_key[heap[parent].second],
-                  help_to_decrease_key[heap[index].second]);
-        std::swap(heap[parent], heap[index]);
+      if (heap_[parent].first > heap_[index].first) {
+        std::swap(help_to_decrease_key_[heap_[parent].second],
+                  help_to_decrease_key_[heap_[index].second]);
+        std::swap(heap_[parent], heap_[index]);
       }
       index = parent;
     }
   }
 
   void SiftDown(int index) {
-    while (2 * index + 1 < size_heap) {
+    while (2 * index + 1 < size_heap_) {
       int first_son = 2 * index + 1;
       int min_son = first_son;
       int second_son = 2 * index + 2;
-      if (second_son < size_heap &&
-          heap[second_son].first < heap[first_son].first) {
+      if (second_son < size_heap_ &&
+          heap_[second_son].first < heap_[first_son].first) {
         min_son = second_son;
       }
-      if (heap[min_son] < heap[index]) {
-        std::swap(help_to_decrease_key[heap[min_son].second],
-                  help_to_decrease_key[heap[index].second]);
-        std::swap(heap[min_son], heap[index]);
+      if (heap_[min_son] < heap_[index]) {
+        std::swap(help_to_decrease_key_[heap_[min_son].second],
+                  help_to_decrease_key_[heap_[index].second]);
+        std::swap(heap_[min_son], heap_[index]);
       }
       index = min_son;
     }
   }
 
+ public:
   void Insert(int insert_number, int index_of_request) {
-    heap[size_heap] = {insert_number, index_of_request};
-    help_to_decrease_key[index_of_request] = size_heap;
-    SiftUp(size_heap++);
+    heap_.push_back({insert_number, index_of_request});
+    help_to_decrease_key_.resize(index_of_request + 1, size_heap_);
+    SiftUp(size_heap_++);
   }
 
   void ExtractMin() {
-    std::swap(help_to_decrease_key[heap[size_heap - 1].second],
-              help_to_decrease_key[heap[0].second]);
-    std::swap(heap[size_heap - 1], heap[0]);
-    --size_heap;
+    std::swap(help_to_decrease_key_[heap_[size_heap_ - 1].second],
+              help_to_decrease_key_[heap_[0].second]);
+    std::swap(heap_[--size_heap_], heap_[0]);
+    heap_.pop_back();
     SiftDown(0);
   }
 
   void DecreaseKey(int index_of_insert_request, int delta) {
-    heap[help_to_decrease_key[index_of_insert_request]].first -= delta;
-    SiftUp(help_to_decrease_key[index_of_insert_request]);
+    heap_[help_to_decrease_key_[index_of_insert_request]].first -= delta;
+    SiftUp(help_to_decrease_key_[index_of_insert_request]);
   }
+
+  long long Min() { return heap_[0].first; }
 };
 
 int main() {
@@ -64,9 +67,6 @@ int main() {
   int number_of_requests;
   std::cin >> number_of_requests;
   Heap heap;
-  heap.help_to_decrease_key.resize(number_of_requests + 1, 0);
-  const int kMaxSizeOfHeap = 100000;
-  heap.heap.resize(kMaxSizeOfHeap);
   std::string command;
   int help_number;
   int index_of_insert_request;
@@ -77,7 +77,7 @@ int main() {
       heap.Insert(help_number, i + 1);
     }
     if (command == "getMin") {
-      std::cout << heap.heap[0].first << '\n';
+      std::cout << heap.Min() << '\n';
     }
     if (command == "extractMin") {
       heap.ExtractMin();
@@ -88,5 +88,4 @@ int main() {
       heap.DecreaseKey(index_of_insert_request, help_number);
     }
   }
-  return 0;
 }
