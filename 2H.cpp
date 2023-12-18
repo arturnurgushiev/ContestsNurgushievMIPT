@@ -10,68 +10,56 @@ class HeapMinMax {
   std::vector<int> help_to_increase_key_;
   int size_heap_ = 0;
 
-  void SiftUpMinHeap(int index) {
+  static void SiftUp(std::vector<std::pair<int, int>>& heap,
+                     std::vector<int>& help, int index, bool is_min_heap) {
     while (index != 0) {
       int parent = (index - 1) / 2;
-      if (min_heap_[parent].first <= min_heap_[index].first) {
+      if ((is_min_heap && heap[parent].first <= heap[index].first) ||
+          (!is_min_heap && heap[parent].first >= heap[index].first)) {
         break;
       }
-      std::swap(help_to_decrease_key_[min_heap_[parent].second],
-                help_to_decrease_key_[min_heap_[index].second]);
-      std::swap(min_heap_[parent], min_heap_[index]);
+      std::swap(help[heap[parent].second], help[heap[index].second]);
+      std::swap(heap[parent], heap[index]);
       index = parent;
     }
+  }
+
+  void SiftDown(std::vector<std::pair<int, int>>& heap, std::vector<int>& help,
+                int index, bool is_min_heap) const {
+    while (2 * index + 1 < size_heap_) {
+      int first_son = 2 * index + 1;
+      int change_son = first_son;
+      int second_son = 2 * index + 2;
+      if (second_son < size_heap_) {
+        if ((is_min_heap && heap[second_son].first < heap[first_son].first) ||
+            (!is_min_heap && heap[second_son].first > heap[first_son].first)) {
+          change_son = second_son;
+        }
+      }
+      if ((is_min_heap && heap[change_son] >= heap[index]) ||
+          (!is_min_heap && heap[change_son] <= heap[index])) {
+        break;
+      }
+      std::swap(help[heap[change_son].second], help[heap[index].second]);
+      std::swap(heap[change_son], heap[index]);
+      index = change_son;
+    }
+  }
+
+  void SiftUpMinHeap(int index) {
+    SiftUp(min_heap_, help_to_decrease_key_, index, true);
   }
 
   void SiftDownMinHeap(int index) {
-    while (2 * index + 1 < size_heap_) {
-      int first_son = 2 * index + 1;
-      int min_son = first_son;
-      int second_son = 2 * index + 2;
-      if (second_son < size_heap_ &&
-          min_heap_[second_son].first < min_heap_[first_son].first) {
-        min_son = second_son;
-      }
-      if (min_heap_[min_son] >= min_heap_[index]) {
-        break;
-      }
-      std::swap(help_to_decrease_key_[min_heap_[min_son].second],
-                help_to_decrease_key_[min_heap_[index].second]);
-      std::swap(min_heap_[min_son], min_heap_[index]);
-      index = min_son;
-    }
+    SiftDown(min_heap_, help_to_decrease_key_, index, true);
   }
 
   void SiftUpMaxHeap(int index) {
-    while (index != 0) {
-      int parent = (index - 1) / 2;
-      if (max_heap_[parent].first >= max_heap_[index].first) {
-        break;
-      }
-      std::swap(help_to_increase_key_[max_heap_[parent].second],
-                help_to_increase_key_[max_heap_[index].second]);
-      std::swap(max_heap_[parent], max_heap_[index]);
-      index = parent;
-    }
+    SiftUp(max_heap_, help_to_increase_key_, index, false);
   }
 
   void SiftDownMaxHeap(int index) {
-    while (2 * index + 1 < size_heap_) {
-      int first_son = 2 * index + 1;
-      int max_son = first_son;
-      int second_son = 2 * index + 2;
-      if (second_son < size_heap_ &&
-          max_heap_[second_son].first > max_heap_[first_son].first) {
-        max_son = second_son;
-      }
-      if (max_heap_[max_son] <= max_heap_[index]) {
-        break;
-      }
-      std::swap(help_to_increase_key_[max_heap_[max_son].second],
-                help_to_increase_key_[max_heap_[index].second]);
-      std::swap(max_heap_[max_son], max_heap_[index]);
-      index = max_son;
-    }
+    SiftDown(max_heap_, help_to_increase_key_, index, false);
   }
 
   void ExtractHelp(std::vector<std::pair<int, int>>& heap,
@@ -207,6 +195,7 @@ void Solve(HeapMinMax& min_max_heap, const std::string& command, int index) {
     min_max_heap.Clear();
     std::cout << "ok" << '\n';
   }
+  std::cout << std::flush;
 }
 
 int main() {
